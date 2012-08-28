@@ -64,7 +64,7 @@ Melfas touchkey register
 #define END_KEY 0x04
 
 #define I2C_M_WR 0		/* for i2c */
-#define DEVICE_NAME "melfas_touchkey"
+#define DEVICE_NAME "sec_touchkey"
 
 #if defined (CONFIG_USA_MODEL_SGH_T769)
 #define BUILTIN_FW_VER	0x0F
@@ -72,7 +72,10 @@ Melfas touchkey register
 #if defined (CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R)
 #define BUIL_FW_VER	0x05
 #endif
-
+// GTI-9210T
+#if defined (CONFIG_AUS_MODEL_GTI_9210T)
+#define BUIL_FW_VER	0x09
+#endif
 
 /*sec_class sysfs*/
 extern struct class *sec_class;
@@ -86,6 +89,9 @@ static int touchkey_keycode[] = {NULL, KEY_BACK, KEY_ENTER, KEY_MENU, KEY_END}; 
 || defined (CONFIG_KOR_MODEL_SHV_E110S) /*|| defined (CONFIG_USA_MODEL_SGH_I717)*/ || defined(CONFIG_KOR_MODEL_SHV_E160L)
 static int touchkey_keycode[5] = {0,KEY_MENU , KEY_HOME, KEY_BACK, KEY_SEARCH};
 #else
+#if defined(CONFIG_AUS_MODEL_GTI_9210T)
+static int touchkey_keycode[3] = { 0, KEY_BACK, KEY_MENU };
+#else
 #if defined (CONFIG_USA_MODEL_SGH_I727)|| defined (CONFIG_USA_MODEL_SGH_T989) || defined (CONFIG_USA_MODEL_SGH_I717)\
 	|| defined (CONFIG_USA_MODEL_SGH_T769) || defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R)\
 	|| defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M)
@@ -97,6 +103,7 @@ static int touchkey_keycode[3] = { 0, KEY_BACK, KEY_MENU };
 #endif
 #endif 
 #endif 
+#endif
 #if defined (CONFIG_USA_MODEL_SGH_T989) || defined (CONFIG_USA_MODEL_SGH_T769)//new touchkey fpcb
 static int touchkey_pba_revision = TOUCHKEY_PBA_REV_NA;
 #endif
@@ -159,7 +166,7 @@ struct workqueue_struct *touchkey_wq;
 
 struct work_struct touch_update_work;
 struct delayed_work touch_resume_work;
-#if defined(CONFIG_USA_MODEL_SGH_I717) || defined (CONFIG_KOR_MODEL_SHV_E160L)
+#if defined(CONFIG_USA_MODEL_SGH_I717) || defined (CONFIG_KOR_MODEL_SHV_E160L) || defined(CONFIG_AUS_MODEL_GTI_9210T)
 static int touchkey_auto_calibration(int autocal_on_off);
 #else
 static void touchkey_auto_calibration(int autocal_on_off);
@@ -308,7 +315,8 @@ int cypress_write_register(u8 addr, u8 w_data)
 || defined (CONFIG_USA_MODEL_SGH_T989) || defined (CONFIG_USA_MODEL_SGH_I727) \
 || defined (CONFIG_USA_MODEL_SGH_I717) || defined(CONFIG_KOR_MODEL_SHV_E160L) \
 || defined(CONFIG_USA_MODEL_SGH_I757) || defined (CONFIG_USA_MODEL_SGH_T769) \
-|| defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R) || defined(CONFIG_CAN_MODEL_SGH_I757M)
+|| defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R) || defined(CONFIG_CAN_MODEL_SGH_I757M) \
+|| defined(CONFIG_AUS_MODEL_GTI_9210T)
 extern unsigned int  get_hw_rev(void);
 #endif
 
@@ -397,7 +405,7 @@ void touchkey_resume_func(struct work_struct *p)
 	
 #if defined (CONFIG_USA_MODEL_SGH_T989)||defined (CONFIG_USA_MODEL_SGH_I727) || defined (CONFIG_USA_MODEL_SGH_I717)\
 	|| defined (CONFIG_USA_MODEL_SGH_T769) || defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R)\
-	|| defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M)
+	|| defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M) || defined(CONFIG_AUS_MODEL_GTI_9210T)
     touchkey_auto_calibration(1/*on*/);
 #elif defined (CONFIG_KOR_MODEL_SHV_E110S)
 	if (get_hw_rev() >= 0x02)
@@ -554,7 +562,7 @@ static irqreturn_t touchkey_interrupt(int irq, void *dummy)  // ks 79 - threaded
 	return IRQ_HANDLED;
 }
 
-#if defined(CONFIG_USA_MODEL_SGH_I717) || defined (CONFIG_KOR_MODEL_SHV_E160L)
+#if defined(CONFIG_USA_MODEL_SGH_I717) || defined (CONFIG_KOR_MODEL_SHV_E160L) || defined(CONFIG_AUS_MODEL_GTI_9210T)
 static int touchkey_auto_calibration(int autocal_on_off)
 {
 	
@@ -616,7 +624,7 @@ static void touchkey_auto_calibration(int autocal_on_off)
     
     msleep(10);	
     // i2c_touchkey_read	(0x05, data, 1);
-    // printk("[TKEY] end touchkey_auto_calibration result = %d",data[0]);
+    printk("[TKEY] end touchkey_auto_calibration result = %d",data[0]);
 }
 #endif
 
@@ -666,7 +674,7 @@ static void melfas_touchkey_early_suspend(struct early_suspend *h)
 		gpio_free(GPIO_TOUCHKEY_SCL);
 		gpio_direction_output(GPIO_TOUCHKEY_SDA, 0);
 		gpio_free(GPIO_TOUCHKEY_SDA);
-#elif defined (CONFIG_EUR_MODEL_GT_I9210)
+#elif defined (CONFIG_AUS_MODEL_GTI_9210T)
 	if (get_hw_rev() >= 0x07){
 		tkey_vdd_enable(0);
 		tkey_led_vdd_enable(0); 			
@@ -736,7 +744,7 @@ static void melfas_touchkey_early_suspend(struct early_suspend *h)
 
 static void melfas_touchkey_early_resume(struct early_suspend *h)
 {
-#if defined (CONFIG_EUR_MODEL_GT_I9210) || defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R) || defined (CONFIG_USA_MODEL_SGH_T769)
+#if defined (CONFIG_AUS_MODEL_GTI_9210T) || defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R) || defined (CONFIG_USA_MODEL_SGH_T769)
  	int ret =0;
 #endif 	
 	set_touchkey_debug('R');
@@ -773,7 +781,7 @@ static void melfas_touchkey_early_resume(struct early_suspend *h)
 				pr_err("%s: request GPIO %s err %d.", __func__, "TKEY_SDA", ret);
 			}		
 			gpio_direction_input(GPIO_TOUCHKEY_SDA);
-#elif defined (CONFIG_EUR_MODEL_GT_I9210)
+#elif defined (CONFIG_AUS_MODEL_GTI_9210T)
 	if (get_hw_rev() >= 0x07){
 		tkey_vdd_enable(1);
 		ret = gpio_request(GPIO_TOUCHKEY_SCL, "TKEY_SCL");
@@ -958,7 +966,7 @@ static int i2c_touchkey_probe(struct i2c_client *client, const struct i2c_device
 || defined (CONFIG_JPN_MODEL_SC_03D) || defined (CONFIG_USA_MODEL_SGH_I717) \
 || defined(CONFIG_KOR_MODEL_SHV_E160L)\
 || defined (CONFIG_USA_MODEL_SGH_T769) || defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R)\
-|| defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M)
+|| defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M) || defined (CONFIG_AUS_MODEL_GTI_9210T)
 
        int touch_auto_calibration_on_off = 0;
 	u8 data[6];
@@ -1026,7 +1034,7 @@ static int i2c_touchkey_probe(struct i2c_client *client, const struct i2c_device
 		touchkey_keycode[1] = KEY_MENU;
 		touchkey_keycode[2] = KEY_BACK; 	
 	}
-#elif  defined (CONFIG_EUR_MODEL_GT_I9210)
+#elif defined (CONFIG_AUS_MODEL_GTI_9210T)
 	if (get_hw_rev() != 0x05 )
 	{
 		touchkey_keycode[1] = KEY_MENU;
@@ -1045,9 +1053,14 @@ static int i2c_touchkey_probe(struct i2c_client *client, const struct i2c_device
 	set_bit(touchkey_keycode[1], input_dev->keybit);
 	set_bit(touchkey_keycode[2], input_dev->keybit);
 #if defined (CONFIG_USA_MODEL_SGH_I727) || defined (CONFIG_USA_MODEL_SGH_T989) || defined (CONFIG_JPN_MODEL_SC_03D) \
-|| defined (CONFIG_KOR_MODEL_SHV_E110S) || defined (CONFIG_USA_MODEL_SGH_I717) || defined(CONFIG_KOR_MODEL_SHV_E160L) || defined (CONFIG_USA_MODEL_SGH_T769)\ 
+|| defined (CONFIG_KOR_MODEL_SHV_E110S) || defined (CONFIG_USA_MODEL_SGH_I717) || defined(CONFIG_KOR_MODEL_SHV_E160L) || defined (CONFIG_USA_MODEL_SGH_T769) \
 || defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R)\
-|| defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M)
+|| defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M) || defined (CONFIG_AUS_MODEL_GTI_9210T)
+	if (get_hw_rev() != 0x05 )
+	{
+	  	touchkey_keycode[1] = KEY_MENU;
+		touchkey_keycode[2] = KEY_BACK; 	
+	}
 	set_bit(touchkey_keycode[3], input_dev->keybit);
 	set_bit(touchkey_keycode[4], input_dev->keybit);
 #endif	
@@ -1076,8 +1089,8 @@ static int i2c_touchkey_probe(struct i2c_client *client, const struct i2c_device
 		printk(KERN_ERR "%s Can't allocate irq .. %d\n", __FUNCTION__, err);
 		return -EBUSY;
 	}
-#if defined(CONFIG_USA_MODEL_SGH_T989)||defined (CONFIG_USA_MODEL_SGH_I727) || defined (CONFIG_USA_MODEL_SGH_T769) || defined(CONFIG_USA_MODEL_SGH_I577)\ 
-	|| defined(CONFIG_CAN_MODEL_SGH_I577R) || defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M)
+#if defined(CONFIG_USA_MODEL_SGH_T989)||defined (CONFIG_USA_MODEL_SGH_I727) || defined (CONFIG_USA_MODEL_SGH_T769) || defined(CONFIG_USA_MODEL_SGH_I577) \
+	|| defined(CONFIG_CAN_MODEL_SGH_I577R) || defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M) || defined (CONFIG_AUS_MODEL_GTI_9210T)
     {
       touchkey_auto_calibration(1/*on*/);
     }
@@ -1138,7 +1151,7 @@ static void init_hw(void)
 		struct pm_gpio cfg;
 	};
 
-#if	defined (CONFIG_USA_MODEL_SGH_I727)
+#if	defined (CONFIG_USA_MODEL_SGH_I727) || defined (CONFIG_AUS_MODEL_GTI_9210T)
 	struct pm8058_gpio_cfg touchkey_int_cfg = 
 	{
 	  PM8058_GPIO_PM_TO_SYS(12), // id-1		
@@ -1190,7 +1203,7 @@ static void init_hw(void)
 				
 		irq_set_irq_type(IRQ_TOUCHKEY_INT, IRQ_TYPE_EDGE_FALLING);
 					
-#elif defined (CONFIG_EUR_MODEL_GT_I9210)
+#elif defined (CONFIG_AUS_MODEL_GTI_9210T)
 	if (get_hw_rev() >= 0x07){
 		irq_set_irq_type(IRQ_TOUCHKEY_INT, IRQ_TYPE_EDGE_RISING);	
 	} else { 
@@ -1304,7 +1317,7 @@ static ssize_t touch_recommend_read(struct device *dev, struct device_attribute 
 	}	
 #elif defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R)
 		data[1] = BUIL_FW_VER;
-#elif defined (CONFIG_EUR_MODEL_GT_I9210)
+#elif defined (CONFIG_AUS_MODEL_GTI_9210T)
 	if (get_hw_rev() >=0x07)
 		data[1] = 0x07;
 	else
@@ -1441,9 +1454,9 @@ static ssize_t touch_led_control(struct device *dev, struct device_attribute *at
 		}
 #if defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R)
 		int_data = int_data *0x10;		
-#elif defined(CONFIG_KOR_MODEL_SHV_E110S) || defined (CONFIG_USA_MODEL_SGH_T989) || defined (CONFIG_JPN_MODEL_SC_03D)\ 
+#elif defined(CONFIG_KOR_MODEL_SHV_E110S) || defined (CONFIG_USA_MODEL_SGH_T989) || defined (CONFIG_JPN_MODEL_SC_03D) \
 	|| defined (CONFIG_USA_MODEL_SGH_I727) || defined (CONFIG_USA_MODEL_SGH_T769)
-#if defined(CONFIG_EUR_MODEL_GT_I9210)
+#if defined (CONFIG_AUS_MODEL_GTI_9210T)
 	if (get_hw_rev() >=0x05 )
 #elif defined (CONFIG_USA_MODEL_SGH_T989) || defined (CONFIG_USA_MODEL_SGH_I727)
 	if (get_hw_rev() >=0x05 )
@@ -1455,7 +1468,7 @@ static ssize_t touch_led_control(struct device *dev, struct device_attribute *at
       {     
 		int_data = int_data *0x10;
 	}
-#elif defined(CONFIG_KOR_MODEL_SHV_E160L)\ 
+#elif defined(CONFIG_KOR_MODEL_SHV_E160L) \
    || defined (CONFIG_USA_MODEL_SGH_I717) || defined(CONFIG_USA_MODEL_SGH_I757) || defined(CONFIG_CAN_MODEL_SGH_I757M)
 		int_data = int_data *0x10;
 #else
@@ -1568,7 +1581,7 @@ static ssize_t touchkey_back_show(struct device *dev, struct device_attribute *a
 			back_sensitivity = ((0x00FF&data[14])<<8)|data[15]; 	
 		}
 	}
-#elif defined(CONFIG_EUR_MODEL_GT_I9210)
+#elif defined (CONFIG_AUS_MODEL_GTI_9210T)
 	{
 		if (get_hw_rev() >= 0x06){
 			printk("called %s data[12] =%d,data[13] = %d\n",__func__,data[12],data[13]);
@@ -2147,7 +2160,7 @@ static int __init touchkey_init(void)
 #elif defined(CONFIG_USA_MODEL_SGH_I577) || defined(CONFIG_CAN_MODEL_SGH_I577R)
 		irq_set_irq_type(IRQ_TOUCHKEY_INT, IRQ_TYPE_EDGE_FALLING);
 
-#elif defined (CONFIG_EUR_MODEL_GT_I9210)
+#elif defined (CONFIG_AUS_MODEL_GTI_9210T)
 	if (get_hw_rev() >= 0x07){
 		irq_set_irq_type(IRQ_TOUCHKEY_INT, IRQ_TYPE_EDGE_RISING);	
 	} else { 
@@ -2184,12 +2197,12 @@ static int __init touchkey_init(void)
 			printk("f/w read fail retry %d\n", retry);
 	}
 
-#if !defined (CONFIG_KOR_MODEL_SHV_E110S) && !defined(CONFIG_KOR_MODEL_SHV_E160L) && !defined(CONFIG_EUR_MODEL_GT_I9210)
+#if !defined (CONFIG_KOR_MODEL_SHV_E110S) && !defined(CONFIG_KOR_MODEL_SHV_E160L) && !defined (CONFIG_AUS_MODEL_GTI_9210T)
     if(retry < 0)
         return 0;
 #endif
 	
-//	printk("[TKEY] %s F/W version: 0x%x, Module version:0x%x, HW_REV: 0x%x\n", __FUNCTION__, data[1], data[2], get_hw_rev());
+	printk("[TKEY] %s F/W version: 0x%x, Module version:0x%x, HW_REV: 0x%x\n", __FUNCTION__, data[1], data[2], get_hw_rev());
 	touch_version = data[1];
 	retry = 3;
 	
@@ -2289,7 +2302,7 @@ static int __init touchkey_init(void)
 		}
 		init_hw();	//after update, re initalize.
 	}
-#elif defined (CONFIG_EUR_MODEL_GT_I9210)
+#elif defined (CONFIG_AUS_MODEL_GTI_9210T)
 	if (get_hw_rev()<0x7 ) // Don't use update under H/W rev0.2
 	{
 		printk("%s : I9210 update tkey...\n",__func__); 
