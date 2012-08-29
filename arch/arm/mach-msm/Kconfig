@@ -1771,7 +1771,14 @@ choice
 
 		config EUR_MODEL_GT_P7320
 			bool "GT-P7320"
+
+
 endchoice
+
+config EUR_MODEL_GT_I9210
+		depends on (USA_MODEL_SGH_I727)
+		default n
+		bool "Eur GT-I9210"
 
 config USA_MODEL_SGH_I727R 
 		depends on (USA_MODEL_SGH_I727)
