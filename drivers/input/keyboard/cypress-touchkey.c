@@ -64,7 +64,7 @@ Melfas touchkey register
 #define END_KEY 0x04
 
 #define I2C_M_WR 0		/* for i2c */
-#define DEVICE_NAME "melfas_touchkey"
+#define DEVICE_NAME "sec_touchkey"
 
 #if defined (CONFIG_USA_MODEL_SGH_T769)
 #define BUILTIN_FW_VER	0x0F
@@ -1137,8 +1137,8 @@ static void init_hw(void)
 		int                gpio;
 		struct pm_gpio cfg;
 	};
-
-#if	defined (CONFIG_USA_MODEL_SGH_I727)
+	
+#if	defined(CONFIG_USA_MODEL_SGH_I727)
 	struct pm8058_gpio_cfg touchkey_int_cfg = 
 	{
 	  PM8058_GPIO_PM_TO_SYS(12), // id-1		
@@ -1163,7 +1163,6 @@ static void init_hw(void)
 		},
 	};
 #endif
-
 	#if defined(CONFIG_KOR_MODEL_SHV_E160L)
     msleep(200);
 	#endif 
