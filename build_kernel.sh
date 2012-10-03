@@ -18,13 +18,16 @@ export INITRAMFS_SOURCE="${KERNELDIR}/../initramfs"
 export INITRAMFS_TMP="/tmp/initramfs-gti9210t"
 export RELEASEDIR="${KERNELDIR}/../releases"
 
-# BuildHostname
+# InitRamFS Branch to use ...
+export RAMFSBRANCH=cm10-testing
+
+# Build Hostname
 export KBUILD_BUILD_HOST=`hostname | sed 's|ip-projects.de|dream-irc.com|g'`
 
 #
 # Version of this Build
 #
-KRNRLS="DreamKernel-GTI9210T-v1.5CM10_RC7"
+KRNRLS="DreamKernel-GTI9210T-v1.6CM10_RC1"
 
 
 #
@@ -95,7 +98,7 @@ echo -e "${TXTGRN}Build: Stage 1 successfully completed${TXTCLR}"
 #
 echo -e "${TXTGRN}Copying initramfs Filesystem to: ${INITRAMFS_TMP}${TXTCLR}"
 cd $INITRAMFS_SOURCE
-git checkout cm10
+git checkout $RAMFSBRANCH
 cd $KERNELDIR
 cp -vax $INITRAMFS_SOURCE $INITRAMFS_TMP
 sleep 1
