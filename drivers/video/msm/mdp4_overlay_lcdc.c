@@ -922,7 +922,6 @@ void mdp4_lcdc_overlay(struct msm_fb_data_type *mfd)
 		mfd->ov0_blt_state = mfd->use_ov0_blt;
 	}
 
-	mutex_lock(&mfd->dma->ov_mutex);
 	mdp4_lcdc_pipe_commit();
 	mutex_unlock(&mfd->dma->ov_mutex);
 
