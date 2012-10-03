@@ -247,6 +247,7 @@ config ARCH_FSM9XXX
 config ARCH_MSM9615
 	bool "MSM9615"
 	select ARM_GIC
+	select GIC_SECURE
 	select ARCH_MSM_CORTEX_A5
 	select CPU_V7
 	select MSM_V2_TLMM
@@ -1781,7 +1782,6 @@ choice
 
 		config USA_MODEL_SGH_I727
                 depends on (TARGET_LOCALE_USA && (USA_OPERATOR_ATT || CAN_OPERATOR_RWC) )
-                        default y
 			bool "USA ATT SGH-I727"
 			
 			
