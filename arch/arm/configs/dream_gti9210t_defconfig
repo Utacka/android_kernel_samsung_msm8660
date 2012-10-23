@@ -1,6 +1,6 @@
 #
 # Automatically generated make config: don't edit
-# Linux/arm 3.0.45 Kernel Configuration
+# Linux/arm 3.0.46 Kernel Configuration
 #
 CONFIG_ARM=y
 CONFIG_SYS_SUPPORTS_APM_EMULATION=y
@@ -35,7 +35,7 @@ CONFIG_IRQ_WORK=y
 CONFIG_EXPERIMENTAL=y
 CONFIG_INIT_ENV_ARG_LIMIT=32
 CONFIG_CROSS_COMPILE="/home/talustus/arm-gti9210t-androideabi/bin/galaxys2-"
-CONFIG_LOCALVERSION="Dreamkernel-GTI9210T-v1.7.1CM10"
+CONFIG_LOCALVERSION="Dreamkernel-GTI9210T-v1.7.2CM10"
 # CONFIG_LOCALVERSION_AUTO is not set
 CONFIG_HAVE_KERNEL_GZIP=y
 CONFIG_HAVE_KERNEL_LZMA=y
