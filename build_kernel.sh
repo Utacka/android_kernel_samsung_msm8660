@@ -14,6 +14,7 @@ TXTCLR='\e[0m'    		# Text Reset
 #
 export KERNELDIR=`readlink -f .`
 export TOOLBIN="${KERNELDIR}/../bin"
+# export INITRAMFS_SOURCE="${KERNELDIR}/../initramfs-ics-stock"
 export INITRAMFS_SOURCE="${KERNELDIR}/../initramfs"
 export INITRAMFS_TMP="/tmp/initramfs-gti9210t"
 export RELEASEDIR="${KERNELDIR}/../releases"
@@ -27,7 +28,7 @@ export KBUILD_BUILD_HOST=`hostname | sed 's|ip-projects.de|dream-irc.com|g'`
 #
 # Version of this Build
 #
-KRNRLS="DreamKernel-GTI9210T-v1.8.0CM10"
+KRNRLS="DreamKernel-GTI9210T-v1.8.2CM10"
 
 
 #
